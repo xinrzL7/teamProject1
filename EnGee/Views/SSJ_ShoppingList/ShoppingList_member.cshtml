@@ -1,0 +1,241 @@
+﻿@model EnGee.ViewModel.SSJ_ShoppingListCombinedViewModel
+
+@{
+    ViewData["Title"] = "ShoppingList_admin";
+    ViewBag.HeaderTitle = "購物清單";
+}
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<meta charset="UTF-8">
+<style>
+    .swal2-popup.swal2-modal {
+        font-size: 12pt;
+    }
+
+    .swal2-modal .swal2-title {
+        font-size: 1.4em;
+    }
+    .card-img {
+        max-height: 150px;
+        min-height: 100px;
+        max-width: 150px;
+        min-width: 100px;
+    }
+    .card-img-overlay {
+        display: none;
+    }
+
+
+    .table .tableoutside th:nth-child(1) {
+        width: 10px;
+    }
+
+    .table .tableoutside th:nth-child(2) {
+        width: 10px;
+    }
+
+    .table .tableoutside th:nth-child(4) {
+        width: 10px;
+    }
+
+    .table .tableoutside th:nth-child(8) {
+        width: 10px;
+    }
+
+    .table .tableoutside th:nth-child(10) {
+        width: 10px;
+    }
+
+    .table .tableoutside th:nth-child(11) {
+        width: 10px;
+    }
+
+    .table-vertical-center th, .table-vertical-center td {
+        vertical-align: middle;
+    }
+
+    .detail-row {
+        background-color: #F8D7DA;
+    }
+
+    .detail-row-title {
+        background-color: #DEC0C3;
+    }
+
+    table{
+        margin : 0px;
+    }
+
+    .table {
+        margin: 0px;
+    }
+
+    td{
+        border:0;
+    }
+
+    .detail-row {
+        border-bottom: 2px solid #BAA1A3;
+    }
+
+    tr td {
+        text-align: center
+    }
+
+    th{
+        text-align: center
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+<main>
+
+    <table class="table table-danger  mt-2 table-vertical-center" style="font-size: 14px;">
+    <thead>
+        <tr>
+            <th style="white-space: nowrap;text-align: center;">
+                序號
+            </th>
+            <th style="white-space: nowrap;text-align: center;">訂單編號</th>
+            <th style="white-space: nowrap;text-align: center;">訂單成立時間</th>
+            <th style="white-space: nowrap;text-align: center;">訂單狀態ID</th>
+            <th style="white-space: nowrap;text-align: center;">訂單狀態</th>
+            <th style="white-space: nowrap;text-align: center;">訂單類型編號</th>
+            <th style="white-space: nowrap;text-align: center;">訂單類型</th>
+            <th style="white-space: nowrap;text-align: center;">買家ID</th>
+            <th class="tableoutside" style="white-space: nowrap;text-align: center;">收件人姓名</th>
+            <th class="tableoutside" style="white-space: nowrap;text-align: center;">收件人姓名電話</th>
+           @*<th style="white-space: nowrap;text-align: center;">買家</th>*@
+            @*@<th style="white-space: nowrap;text-align: center;">超取超商店號</th>*@
+            <th style="white-space: nowrap;text-align: center;">運費點數</th>
+            <th style="white-space: nowrap;text-align: center;">訂單總花費</th>
+                <th style="white-space: nowrap;text-align: center;">功能鈕</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            int count=0;
+                @foreach (var order in Model.Orders)
+            {
+                count++;
+                <tr>
+                    <td>
+                        @count
+                    </td>
+                    <td>
+                            @Html.DisplayFor(modelItem => order.OrderID)
+                    </td>
+                    <td>
+                            @Html.DisplayFor(modelItem => order.OrderDate)
+                    </td>
+                    <td>
+                            @Html.DisplayFor(modelItem => order.OrderStatus)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => order.OrderStatusDescription)
+                    </td>
+                    <td>
+                            @Html.DisplayFor(modelItem => order.OrderCatagory)
+                    </td>
+                    <td>
+                            @Html.DisplayFor(modelItem => order.OrderCatagoryDescription)
+                    </td>
+                    <td>
+                            @Html.DisplayFor(modelItem => order.BuyerID)
+                    </td>
+                    <td style="text-align: center;">
+                        @Html.DisplayFor(modelItem => order.ReceiverName)
+                    </td>
+                    <td style="text-align: center;">
+                        @Html.DisplayFor(modelItem => order.ReceiverTEL)
+                    </td>
+                   @* <td>
+                          @Html.DisplayFor(modelItem => order.BuyerUsername)
+                    </td>*@
+                    @*<td>
+                            @Html.DisplayFor(modelItem => order.ConvienenNum)
+                    </td>*@
+                    <td>
+                            @Html.DisplayFor(modelItem => order.DeliveryFee)
+                    </td>
+                    <td>
+                            @Html.DisplayFor(modelItem => order.OrderTotalUsagePoints)
+                    </td>
+                        <td>
+                            <div class="btn btn-sm btn-success me-2">
+                                <a class="text-black" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#details-@order.OrderID">明細</a> 
+                            </div>
+                        </td>
+
+                 </tr>
+                 <tr class="collapse" id="details-@order.OrderID">
+                        <td colspan="24">
+                            <table class="table">
+                                <thead>
+                                        <tr class="collapse detail-row-title" id="details-@order.OrderID">
+                                        @*<th></th>*@
+                                        <th>訂單明細編號</th>
+                                        <th>產品編號</th>
+                                       @* <th>產品名稱</th>*@
+                                        <th>商品單價</th>
+                                        <th>商品購買數量</th>
+                                        <th>賣家ID</th>
+                                        @*<th>賣家</th>*@
+                                        <th>寄送方式ID</th>
+                                        @*<th>寄送方式</th>*@
+                                        <th>寄送地址</th>
+                                    </tr>
+                                </thead>
+                    @foreach (var orderDetail in Model.OrderDetails.Where(od => od.OrderID == order.OrderID))
+                  {
+                        
+                                <tbody>
+                                        <tr class="collapse detail-row" id="details-@order.OrderID">
+                                            @*<td><img class="card-img img-fluid" src="@orderDetail.ProductImagePath" alt="@orderDetail.ProductName" width="50" /></td>*@
+                                            <td>@Html.DisplayFor(modelItem => orderDetail.OrderDetailID)</td>
+                                            <td>@Html.DisplayFor(modelItem => orderDetail.ProductID)</td>
+                                            @*<td>@Html.DisplayFor(modelItem => orderDetail.ProductName)</td>*@
+                                            <td>@Html.DisplayFor(modelItem => orderDetail.ProductUnitPoint)</td>
+                                            <td>@Html.DisplayFor(modelItem => orderDetail.OrderQuantity)</td>
+                                            <td>@Html.DisplayFor(modelItem => orderDetail.SellerID)</td>
+                                            @*<td>@Html.DisplayFor(modelItem => orderDetail.SellerUsername)</td>*@
+                                            <td>@Html.DisplayFor(modelItem => orderDetail.DeliveryTypeID)</td>
+                                            <td>@Html.DisplayFor(modelItem => orderDetail.DeliveryAddress)</td>
+                                    </tr>
+                                </tbody>
+                                <hr>
+                            }
+                            </table>
+                        </td>
+                    </tr>
+            }
+        }
+    </tbody>
+</table>
+    @{
+        int totalPages = ViewBag.TotalPages;
+        int currentPage = ViewBag.PageIndex;
+    }
+
+    <nav class="m-3"aria-label ="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("ShoppingList_member", new { page = currentPage - 1 })">上一頁</a>
+            </li>
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("ShoppingList_member", new { page = i })">@i</a>
+                </li>
+            }
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("ShoppingList_member", new { page = currentPage + 1 })">下一頁</a>
+            </li>
+        </ul>
+    </nav>
+</main>
+@section Scripts {
+    <script>
+
+    </script>
+}

@@ -1,0 +1,384 @@
+﻿@model EnGee.Models.CHI_CMemberWrap
+
+@{
+    ViewData["Title"] = "個人檔案";
+    ViewBag.HeaderTitle = "個人主頁";
+}
+@{
+    string accessText;
+    switch (Model.Access)
+    {
+        case 0:
+            accessText = "管理員";
+            break;
+        case 1:
+            accessText = "一般會員";
+            break;
+        case 2:
+            accessText = "員工";
+            break;
+        case 3:
+            accessText = "公益團體";
+            break;
+
+        default:
+            accessText = Model.Access.ToString();
+            break;
+    }
+}
+
+<head>
+    <link rel="stylesheet" href="~/css/CHIACHI_UserProfile.css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+
+
+    <div class="container emp-profile bg-white">
+        <form method="post">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="profile-img">
+                        @if (!string.IsNullOrEmpty(Model.PhotoPath))
+                        {
+                            <img src="~/images/UserImage/@Model.PhotoPath" alt="User Photo"/>
+                        }
+                        else
+                        {
+                            <img src="~/images/UserImage/profile.png" alt="Default User Photo"/>
+                        }
+                        
+                    </div>                   
+                </div>
+                <div class="col-md-8">
+                    <div class="profile-head">
+                        <h5 class="mb-3">
+                            User Id #@Model.Username
+                        </h5>
+                        <!-- 會員編輯按鈕 -->
+                        <div class="mb-2">
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal">
+                                編輯資料
+                            </button>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editPasswordModal">
+                                修改密碼
+                            </button>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ApplyModal">
+                                會員身分變更
+                            </button><br />
+                        </div>                        
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="profile-tab" data-toggle="tab" href="#buyer" role="tab" aria-controls="buyer" aria-selected="false">買方評價</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#seller" role="tab" aria-controls="seller" aria-selected="false">賣方評價</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#points" role="tab" aria-controls="points" aria-selected="false">我的點數</a>
+                            </li>                           
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- 會員左側顯示板 -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="profile-work">
+                        <p class="proile-rating">綜合評價</p>
+                        <span>⭐⭐⭐⭐</span>
+                        <p>個人簡介</p>                        
+                        <div>
+                            @Model.Introduction
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="tab-content profile-tab" id="myTabContent">
+                        <!-- 買方評價内容 -->
+                        <div class="tab-pane fade show active" id="buyer" role="tabpanel" aria-labelledby="profile-tab">
+                            <p>ADELYN </p>
+                            ⭐⭐⭐⭐⭐
+                            <span>CP值超高❤️❤️❤️</span>
+                            <hr />
+                            <p>MURPHY </p>
+                            ⭐⭐⭐⭐⭐
+                            <span>讚👍👍👍👍👍👍👍</span>
+                            <hr />
+                            <p>Lauren</p>
+                            ⭐
+                            <span>包裝品質不好</span>
+                            <hr />
+                            <p>VICTORIA RYAN</p>
+                            ⭐⭐⭐⭐⭐
+                            <span>出貨快速❤️</span>
+                        </div>
+
+                        <!-- 賣方評價内容 -->
+                        <div class="tab-pane fade" id="seller" role="tabpanel" aria-labelledby="seller-tab">
+                            <p>FISCHER</p>
+                            ⭐⭐⭐⭐
+                            <span>好買家~取貨快速</span>
+                            <hr />
+                            <p>SERRANO</p>
+                            ⭐⭐⭐⭐⭐
+                            <span>貼心的買家👍</span>
+                            <hr />
+                            <p>PATTON</p>
+                            ⭐⭐
+                            <span>殺價人狠話不多</span>
+                            <hr />
+                            <p>HODGES</p>
+                            ⭐⭐⭐⭐⭐
+                            <span>愉快的交易~~~👍❤️</span>
+                        </div>
+
+                        <!-- 我的點數内容 -->
+                        <div class="tab-pane fade" id="points" role="tabpanel" aria-labelledby="points-tab">
+                            <div class="container">
+                                <div style="background-color: #ead8d8;width: 450px;height: 100px;border-radius: 20px; text-align: center;" class="shadow border rounded">
+                                    <h2 class="text-white mt-3">💎我的凹凹點💎</h2>
+                                    <p class="mt-3">尚餘 @Model.Point 點</p>
+                                </div>
+                                <button type="button" class="btn btn-primary mt-4" onclick="window.location.href='/NL_TopUp/Index'">
+                                    手刀儲值
+                                </button>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>               
+            </div>
+        </form>
+    </div>
+    <!-- 會員資料編輯視窗 -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">會員資料修改</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- 會員資料編輯表單內容 -->
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="MemberId" />
+                        <div>
+                            <div class="avatar-wrapper">
+                                @if (!string.IsNullOrEmpty(Model.PhotoPath))
+                                {
+                                    <img src="~/images/UserImage/@Model.PhotoPath" alt="User Photo" class="profile-pic" />
+                                }
+                                else
+                                {
+                                    <img src="~/images/UserImage/profile.png" alt="Default User Photo" class="profile-pic" />
+                                }
+                                <div class="upload-button">
+                                    <i class="fa fa-arrow-circle-up" aria-hidden="true"></i>
+                                </div>
+                                <input class="file-upload" type="file" asp-for="photo" accept=".jpg, .jpeg, .png" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Email">Email</label>
+                                <input asp-for="Email" class="form-control" />
+                                <button type="submit" class="btn btn-primary mt-2" asp-action="verifyingEmail">發送驗證信</button>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Fullname">全名</label>
+                                <input asp-for="Fullname" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Birth">生日</label>
+                                <input type="date" asp-for="Birth" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Gender">性別</label><br>
+                                <input type="radio" asp-for="Gender" class="" value="0" id="Male" >
+                                <label for="Male">男</label>
+                                <input type="radio" asp-for="Gender" class="" value="1" id="Female" checked>
+                                <label for="Female">女</label>
+                                <input type="radio" asp-for="Gender" class="" value="2" id="Unknow">
+                                <label for="Unknow">不透漏</label>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Address">聯繫地址</label>
+                                <input asp-for="Address" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Phone">手機號碼</label>
+                                <input asp-for="Phone" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Introduction">個人簡介</label>
+                                <input asp-for="Introduction" class="form-control" maxlength="200" style="height:200px"/>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">保存</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                            </div>
+                        </div>                       
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 會員帳密編輯視窗 -->
+    <div class="modal fade" id="editPasswordModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">密碼修改</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- 會員帳密編輯表單內容 -->
+                    <form asp-action="EditPassword" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="MemberId" />
+                        <div>
+                            <div class="form-group">
+                                <label for="NewPassword">新密碼</label>
+                                <input type="password" id="newPassword" class="form-control" asp-for="NewPassword">
+                                <span class="badge bg-primary text-wrap mt-1">須符合6~25個字符,包含至少一大寫及一小寫英文字母與數字</span>
+                            </div>  
+                            <div class="form-group">
+                                <label for="confirm_password">確認新密碼</label>
+                                <input type="password" id="confirm_password" class="form-control" asp-for="ConfirmPassword" />
+                                <span class="badge bg-primary text-wrap mt-1">新密碼尚未確認</span>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" id="submit" class="btn btn-primary">保存</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 會員身分變更編輯視窗 -->
+    <div class="modal fade" id="ApplyModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">會員身分變更</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- 會員身分變更編輯表單內容 -->
+                    <form asp-action="Apply" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="MemberId" />
+                        <div>
+                            <span class="badge bg-info text-wrap mt-1" style="text-align: center; display:block">當前帳號身分: @accessText</span>
+                            <div class="avatar-wrapper">
+                                
+                                @if (!string.IsNullOrEmpty(Model.CharityProof))
+                                {
+                                    <img src="~/images/CharityProof/@Model.CharityProof" alt="User Photo" class="profile-pic" />
+                                }
+                                else
+                                {
+                                    <img src="~/images/UserImage/charityProof.png" alt="Default User Photo" class="profile-pic" />
+                                }
+                                <div class="upload-button">
+                                    <i class="fa fa-arrow-circle-up" aria-hidden="true"></i>
+                                </div>
+                                <input class="file-upload" type="file" asp-for="photoCharityProof" accept=".jpg, .jpeg, .png" />
+                            </div>
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <label asp-for="Username">慈善機構登記名稱</label>
+                                    <input asp-for="Username" class="form-control" />
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Fullname">慈善機構代表人</label>
+                                    <input asp-for="Fullname" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">送出變更需求</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script> //大頭照的js
+    $(document).ready(function () {
+
+        var readURL = function (input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('.profile-pic').attr('src', e.target.result);
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $(".file-upload").on('change', function () {
+            readURL(this);
+        });
+
+        $(".upload-button").on('click', function () {
+            $(".file-upload").click();
+        });
+    });
+</script>
+
+<script> //檢查密碼的js
+    var $password = $("#newPassword");
+    var $confirmPass = $("#confirm_password");
+
+    //Check the length of the Password
+    function checkLength() {
+        return $password.val().length > 5;
+    }
+    //If checkLength() is > 5 then we'll hide the hint
+    function PassLength() {
+        if (checkLength()) {
+            $password.next().hide();
+        } else {
+            $password.next().show();
+        }
+    }
+    //Check to see if the value for pass and confirmPass are the same
+    function samePass() {
+        return $password.val() === $confirmPass.val();
+    }    
+
+    //If samePass returns true, we'll hide the hint
+    function PassMatch() {
+        if (samePass()) {
+            $confirmPass.next().hide();
+        } else {
+            $confirmPass.next().show();
+        }
+    }
+    function canSubmit() {
+        return samePass() && checkLength();
+    }
+    function enableSubmitButton() {
+        $("#submit").prop("disabled", !canSubmit());
+    }
+    //Calls the enableSubmitButton() function to disable the button
+    enableSubmitButton();
+
+    $password.keyup(PassLength).keyup(PassMatch).keyup(enableSubmitButton);
+    $confirmPass.focus(PassMatch).keyup(PassMatch).keyup(enableSubmitButton);
+
+</script>

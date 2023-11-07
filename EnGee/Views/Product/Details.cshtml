@@ -1,0 +1,271 @@
+﻿@model EnGee.ViewModel.SSJ_ProductDetailsViewModel
+@*商品詳情*@
+@{
+    ViewBag.Title = Model.ProductName + " Details";
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+    .product-image-section img {
+        width: 250px;
+        height: 100%;
+        object-fit: contain;
+        max-height: 250px;
+    }
+
+    input:disabled {
+        opacity: 0.5; /* 使元素半透明 */
+        cursor: not-allowed; /* 顯示不允許的光標 */
+    }
+</style>
+<script>
+    $.ajax({
+        type: "GET",
+        url: "/Product/GetDeliveryTypeIdForProduct",
+            data: { productId: @Model.ProductId },
+        success: function (deliveryTypeId)
+        {
+            // 預設禁用所有選項
+            $('input[name="deliverytypeid"]').prop('disabled', true).addClass('disabled-input');
+
+            switch (deliveryTypeId)
+            {
+                case 1:
+                    $('input[data-delivery-type="宅配"]').prop('disabled', false).removeClass('disabled-input').prop('checked', true);
+                    break;
+                case 2:
+                    $('input[data-delivery-type="超商門市取貨"]').prop('disabled', false).removeClass('disabled-input').prop('checked', true);
+                    break;
+                case 3:
+                    $('input[name="deliverytypeid"]').prop('disabled', false).removeClass('disabled-input');
+                    $('input[data-delivery-type="宅配"]').prop('checked', true);
+                    break;
+                default:
+                    console.error("Unknown DeliveryTypeId for product:", productId, " DeliveryTypeId:", deliveryTypeId);
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown)
+        {
+            console.error("Ajax request failed:", textStatus, errorThrown);
+        }
+    });
+</script>
+<main>
+    <div class="container py-5">
+        <div class="row border-0 ">
+            <div class="product-details-container d-flex justify-content-center m-2">
+                <div class="product-image-section col-l-6 col-md-6 col-sm-6 col-xs-4 col-2 d-flex align-items-center justify-content-center">
+                    <img src="@Model.ProductImagePath" alt="@Model.ProductName Image">
+                </div>
+                <div class="product-details-container col-md-4 col-4  d-flex align-items justify-content-center ms-5">
+                    <div class="product-Detail-section fz-size28px">
+                        <div class="product-info-section d-flex flex-column">
+                            <div class="product-info-row">
+                                <h1 class="product-title">@Model.ProductName</h1>
+                            </div>
+                            <div class="product-info-row">
+                                <div class="product-brand">品牌: @Model.BrandName</div>
+                                <div class="product-category">主分類: @Model.MainCategoryName</div>
+                                <div class="product-subcategory">子分類: @Model.SubcategoryName</div>
+                                <div class="product-description">商品詳情: @Model.ProductDescribe</div>
+                                <!-- 其他資訊行... -->
+                            </div>
+                            <div class="product-info-row">
+                                <div class="product-price">單價: @Model.ProductUnitPoint 點</div>
+                                <div class="product-remaining-quantity">剩餘數量: @Model.ProductRemainingQuantity</div>
+                                <div class="product-expiration-date">過期日期 @Model.ProductExpirationDate.ToShortDateString()</div>
+                                <div class="product-usage-status">使用狀態: @Model.ProductUsageStatus</div>
+                            </div>
+                            <div class="product-info-row">
+                                <div class="product-delivery-type">送貨方式: @Model.DeliveryTypeName</div>
+                                <div class="product-delivery-fee">運費:  </div>
+                                <div class="product-seller-name">賣家: </div>
+                            </div>
+                        </div>
+                        <div>
+                            <form id="productForm" asp-controller="Shopping" asp-action="AddToCartAndReturnCarView" method="post">
+                                <!-- Product ID (Hidden) -->
+                                <input type="hidden" name="txtProductId" value="@Model.ProductId" class="txtProductId" />
+                                <input type="hidden" name="deliveryOption" value="" class="deliveryOptionInput" />
+
+                                <div class="Purchase-quantity-section d-flex">
+                                    <label class="" for="txtCount">數量:</label>
+                                    <button class="btn btn-rong-s btnHoverStyle2" type="button" id="btnMinus">-</button>
+                                    <div class="col-md-10 w-64px">
+                                        @Html.TextBox("txtCount", "1", new { @class = "form-control", @readonly = "readonly" })
+                                    </div>
+                                    <button class="btn btn-rong-s btnHoverStyle2" type="button" id="btnPlus">+</button>
+                                </div>
+
+                                <!-- TODO要根據資料庫運送方式顯示-->
+                                <div class="choose-product-delivery-section d-flex flex-wrap">
+                                    <div id="delyTitle">配送方式:</div>
+                                    <div class="shippingList">
+                                        <label><input type="radio" name="deliverytypeid" data-delivery-type="宅配" value="1" id="homeDelivery" checked="checked">宅配</label>
+                                        <label><input type="radio" name="deliverytypeid" data-delivery-type="超商門市取貨" value="2" id="StorePickup">超商門市取貨</label>
+
+                                    </div>
+                                </div>
+
+                                <div class="product-action-section d-flex">
+                                    <button class="btn btn-m btnHoverStyle2 m-2 add-to-cart" type="button">加入購物車</button>
+                                    <button class="btn btn-m btnHoverStyle2 m-2" type="submit" name="actionType" value="buyNow" class="buy-now">立即購買</button>
+                                    <a class="hrefstyle hrefstyle1:hover mt-2 fz-size16px ms-2" href="@Url.Action("IndexSSJ", "Product")">繼續購物</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    $(document).ready(function ()
+    {
+       
+        // 初始化設置
+        var maxQuantity = parseInt($(".product-remaining-quantity").text().replace("剩餘數量: ", ""), 10);
+        // var initialDelivery = $("input[name='deliverytypeid']:checked").attr("data-delivery-type");
+        // $(".deliveryOptionInput").val(initialDelivery);
+
+        // // 當選擇配送方式時
+        // $("input[name='deliverytypeid']").on("change", function ()
+        // {
+        //     var selectedDelivery = $(this).attr("data-delivery-type");
+        //     $(".deliveryOptionInput").val(selectedDelivery);
+        // });
+
+        // 當點擊 "增加" 按鈕
+        $("#btnPlus").on("click", function ()
+        {
+            var currentCount = parseInt($("#txtCount").val(), 10);
+            if (currentCount < maxQuantity) {
+                $("#txtCount").val(currentCount + 1);
+            }
+        });
+
+        // 當點擊 "減少" 按鈕
+        $("#btnMinus").on("click", function ()
+        {
+            var currentCount = parseInt($("#txtCount").val(), 10);
+            if (currentCount > 1)
+            { // 確保數量不會小於1
+                $("#txtCount").val(currentCount - 1);
+            }
+        });
+        //----------------------------------
+        //賣家ID
+        $.ajax({
+            type: "GET", // 這裡假設是GET請求，根據你的後端設置調整
+            url: "/Product/GetProductSellerID", // 你的API端點路徑
+            data: { value: @Model.ProductId }, // 將選擇的值作為請求參數
+            success: function (response)
+            {
+                console.log(response);
+                $(".product-seller-name").html("賣家 :  " + response);
+            },
+            error: function ()
+            {
+                $(".product-seller-name").html(" NULL");
+            }
+        });
+
+        // --------------------------------
+        // 獲取運費的函數
+        function fetchDeliveryFee()
+        {
+            var selectedValue = $("input[name='deliverytypeid']:checked").val();
+            $.ajax({
+                type: "GET",
+                url: "/Product/GetDeliveryTypeDetails",
+                data: { value: selectedValue },
+                success: function (response)
+                {
+                    $(".product-delivery-fee").html("運費: " + response+"點");
+                },
+                error: function ()
+                {
+                    $(".product-delivery-fee").html("運費: NULL");
+                }
+            });
+        }
+
+        fetchDeliveryFee();
+        //變更寄送方式radio時運費連動
+        $("input[name='deliverytypeid']").on("change", fetchDeliveryFee);
+        // --------------------------------
+        // 此段為當頁面加載後的自動觸發，用於再次嘗試加入購物車
+        if ('@ViewBag.RedirectToAction' === "AddToCart")
+        {
+            var formData = {
+                txtProductId: '@Context.Session.GetInt32("TempProductId")',
+                txtCount: '@Context.Session.GetInt32("TempTxtCount")',
+                deliverytypeid: '@Context.Session.GetInt32("TempDeliverytypeid")'
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/Shopping/AddToCart",
+                data: formData,
+                success: function (response)
+                {
+                    if (response.success)
+                    {
+                        alert("已加入購物車");
+                    }
+                }
+            });
+        }
+
+        // 為使用者點擊"加入購物車"按鈕時的手動觸發
+        $(".add-to-cart").on("click", function (e)
+        {
+            e.preventDefault();
+
+            var formData = $("#productForm").serialize();
+
+            $.ajax({
+                type: "POST",
+                url: "/Shopping/AddToCart",
+                data: formData,
+                success: function (response)
+                {
+                    if (response.needToLogin)
+                    {
+                        window.location.href = "/Home/Login";
+                    } else if (response.success)
+                    {
+                        alert("已加入購物車");
+                    }
+                },
+                error: function ()
+                {
+                    alert("操作失敗，請稍後再試");
+                }
+            });
+        });
+    @* // 當點擊"立即購買" 時 *@
+            $(".buy-now").on("click", function (e)
+            {
+                e.preventDefault(); // 阻止預設事件
+
+                var formData = $("#productForm").serialize();
+
+                // 使用 AJAX 提交
+                $.ajax({
+                    type: "POST",
+                    url: "/Shopping/AddToCartAndReturnCarView",
+                    data: formData,
+                    success: function (response)
+                    {// 成功時重定向到 CartView
+                        window.location.href = "/Shopping/CartView";
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        alert("操作失敗，請稍後再試");
+                    }
+                });
+            });
+    });
+</script>
+

@@ -1,0 +1,192 @@
+﻿@model EnGee.ViewModels.Rong_CollectInformationViewModel
+
+@{
+    ViewBag.HeaderTitle = "許願內容";
+}
+<div class="container pb-5">
+    <div class="row">
+        <div class="col-md-5 mt-5">
+            <div class="row mb-5" style="height:300px;">
+                <img name="CollectImagePath" class="border-3" src="~/images/donation/@Html.DisplayFor(model =>model.CollectImagePath)" style=" height: 100%; object-fit: contain" ; />
+            </div>
+            <div class="row">
+                <ul class="list-unstyled">
+                    <li>
+                        <div class="pb-1 collapsed d-flex justify-content-between h5 fz-color2 border-bottom fw-bold">
+                            提供之寄送方式@* <i class="fa-solid fa-chevron-down down-arrow ms-5"></i> *@
+                        </div>
+                    </li>
+                    @if (Model.DeliveryTypeId == 1)
+                    {
+                        <li name="DeliveryType" class="d-flex justify-content-between m-1 fz-color2">
+                            @Html.DisplayFor(model => model.DeliveryType) @Html.DisplayFor(model=>model.DeliveryFee) 點
+                        </li>
+                        <li name="DeliveryType" class="d-flex justify-content-between m-1 fz-color2">
+                            寄件地址：@Html.DisplayFor(model => model.DeliveryAddress)
+                        </li>
+                    }
+                    else if (Model.DeliveryTypeId == 2)
+                    {
+                        <li name="DeliveryType" class="d-flex justify-content-between m-1 fz-color2">
+                            @Html.DisplayFor(model => model.DeliveryType) @Html.DisplayFor(model=>model.DeliveryFee) 點
+                        </li>
+                        <li name="DeliveryType" class="d-flex justify-content-between m-1 fz-color2">
+                            7-11超商店號：@Html.DisplayFor(model => model.ConvenienNum)
+                        </li>
+                    }
+                    else if (Model.DeliveryTypeId == 3)
+                    {
+                        <li name="DeliveryType" class="d-flex justify-content-between m-1 fz-color2">
+                            宅配 150 點
+                        </li>
+                        <li name="DeliveryType" class="d-flex justify-content-between m-1 fz-color2">
+                            寄件地址：@Html.DisplayFor(model => model.DeliveryAddress)
+                        </li>
+                        <li name="DeliveryType" class="d-flex justify-content-between m-1 fz-color2">
+                            超商 60 點
+                        </li>
+                        <li name="DeliveryType" class="d-flex justify-content-between m-1 fz-color2">
+                            7-11超商店號：@Html.DisplayFor(model => model.ConvenienNum)
+                        </li>
+                    }
+                </ul>
+            </div>
+
+        </div>
+        <div class="col-md-7 mt-5 ps-5">
+            <div class="row d-flex justify-content-between align-items-center">
+                <div class="col-auto">
+                    <h3 class="my-2 fw-bold fz-color1">@Html.DisplayFor(model => model.CollectTitle)</h3>
+                </div>
+            </div>
+            <div class="row d-flex justify-content-end">
+                <a href="#" data-bs-toggle="modal" data-bs-target="#publisherInfo" class="text-decoration-none fz-color2">
+                    發布者：@Html.DisplayFor(model => model.Username)
+                </a>
+            </div>
+            <div class="row g-1 d-flex align-items-center justify-content-end border-bottom pb-2">
+                <div class="col-auto fz-color2">
+                    募集時間：
+                </div>
+                <div class="col-auto fz-color2">
+                    @Html.DisplayFor(model => model.CollectStartDate)
+                </div>
+                <div class="col-auto">
+                    <span class="fz-color2">–</span>
+                </div>
+                <div class="col-auto fz-color2">
+                    @Html.DisplayFor(model => model.CollectEndDate)
+                </div>
+            </div>
+            <div class="row pt-5">
+                <h5 class="fz-color2 fw-bold"><i class="fa-solid fa-seedling me-1 "></i>募集需求描述</h5>
+                <div>
+                    <p class="p-caption fz-color1 px-4 pt-2">
+                        @Html.DisplayFor(model => model.CollectCaption)
+                    </p>
+                </div>
+
+            </div>
+            <div class="row mt-5">
+                <h5 class="fz-color2 fw-bold"><i class="fa-solid fa-seedling me-1 "></i>需求品項</h5>
+                <table class="table table-hover text-center mt-4">
+                    <thead>
+                        <tr>
+                            <th style="color:#946E6E;">品項名稱</th>
+                            <th style="color:#946E6E;">目前仍需要的數量</th>
+                            <th style="color:#946E6E;">目前已募集到的數量</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fz-color2">@Html.DisplayFor(model => model.CollectItemName)</td>
+                            <td class="fz-color2">@Html.DisplayFor(model => model.CollectAmount)</td>
+                            <td class="fz-color2">@ViewBag.TotalDonationAmount</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            @if (ViewBag.ShowDonateBtn)
+            {
+                <div class="row mt-5">
+                    <div class="d-flex justify-content-end">
+                        <a href="@Url.Action("Donate", new { id = Model.CollectId })" id="donateBtn" class="btn-border btn btn-lg fw-bold fz-color2 a" data-show-alert="@ViewBag.ShowAlert">我要捐贈</a>
+                    </div>
+                </div>
+            }
+
+            @if (ViewBag.ShowEditAndDeleteButton)
+            {
+                <div class="row mt-2">
+                    <div class="d-flex justify-content-end">
+                        <a asp-controller="Collect" asp-action="EditCollect" asp-route-id="@Model.CollectId" id="editCollect" class="me-3 btn-border btn btn-lg fw-bold fz-color2 a">修改</a>
+                        <a asp-controller="Collect" asp-action="DeleteCollectMember" asp-route-id="@Model.CollectId" id="deleteCollect" class="btn-border btn btn-lg fw-bold fz-color2 a" onclick="return confirm('確定要刪除嗎?')">刪除</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    @* 發布者的資訊 *@
+    <div class="modal fade" id="publisherInfo" tabindex="-1" role="dialog" aria-labelledby="publisherInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="publisherInfoModalLabel">許願發布者資料</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div class="rounded-circle overflow-hidden mb-5" style="width: 150px; height: 150px;">
+                            @if (Model.member != null && !string.IsNullOrEmpty(Model.member.PhotoPath))
+                            {
+                                <img src="~/images/UserImage/@Model.member.PhotoPath" alt="Publisher Photo" class="w-100 h-100"/>
+                            }
+                            else
+                            {
+                                <img src="~/images/UserImage/profile.png" alt="Default User Photo" class="w-100 h-100" />
+                            }
+                        </div>
+                        <div >
+                            公益團體 / 機構名稱：@Html.DisplayFor(model=>model.member.Username)
+                        </div>
+                       
+                            
+                        @if (Model.member.Introduction == null)
+                        {
+                            <div>簡介：尚無內容</div>
+                        }
+                        else
+                        {
+                            <div>簡介：@Html.DisplayFor(model=>model.member.Introduction)</div>
+                        }
+
+                        <div>
+                            聯絡地址：@Html.DisplayFor(model=>model.member.Address)
+
+                        </div>
+                        <div>
+                            聯絡電話：@Html.DisplayFor(model=>model.member.Phone)
+                        </div>
+                        <div>
+                            目前已許願 @ViewBag.Published 次
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.getElementById("donateBtn").addEventListener("click", function (e) {
+            var showAlert = this.getAttribute("data-show-alert") === "True"
+            if (showAlert) {
+                alert("請先登入或註冊會員！");
+                e.preventDefault();
+                window.location.href = "/Home/Login";
+            }
+        });
+    </script>
+</div>
+
+

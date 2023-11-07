@@ -1,0 +1,94 @@
+﻿@model Rong_CDonationWrap
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewBag.HeaderTitle = "捐贈表單修改";
+}
+<div class="container py-5">
+    <form asp-action="EditDonation" id="editForm" method="post" class="m-auto col-md-8 g-3">
+        <div asp-validation-summary="ModelOnly" class="text-danger "></div>
+
+        <input type="hidden" name="DonationOrderId" value="@Model.DonationOrderId" />
+@*         <input type="hidden" name="DonationStatus" value="1" />
+ *@
+        <div class="row form-group mb-4">
+            <div class="form-group col-md-6 mb-3">
+                <label asp-for="DonarName" class="form-label h5 fz-color1">捐贈人姓名</label>
+                <input type="text" asp-for=DonarName class="form-control mt-1 fz-color1" id="DonarName" placeholder="姓名"
+                       required>
+            </div>
+            <div class="form-group col-md-6 mb-3">
+                <label asp-for="DonarPhone" class="form-label h5 fz-color1">捐贈人電話</label>
+                <input type="text" class="form-control mt-1 fz-color1" asp-for="DonarPhone" id="DonarPhone" placeholder="電話"
+                       required>
+            </div>
+        </div>
+        <div class="form-group mb-4">
+            <label for="" class="h5 fz-color1">捐贈品項</label>
+            <div class="row p-3">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th class="col-5" style="color:#946E6E;">捐贈品項名稱</th>
+                            <th class="col-3" style="color:#946E6E;">徵求數量</th>
+                            <th class="col-4" style="color:#946E6E;">您的捐贈數量</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fz-color3">
+                                <i class="fa-solid fa-hand-holding-heart me-2 icon-style"></i>
+                                @Html.DisplayFor(model => model.CollectItemName)
+                            </td>
+                            <td class="fz-color3">
+                                @Html.DisplayFor(model => model.CollectAmount)
+                            </td>
+                            <td class="fz-color3">
+                                <input type="number" asp-for="DonationAmount" id="DonationAmount" class="form-control fz-color1" min="1" max="@Html.DisplayFor(model => model.CollectAmount)" placeholder="選擇數量" required>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="form-group mb-4">
+            <div class="row d-flex align-items-center align-self-center">
+                <div class="col-auto">
+                    <label class="form-label h5 fz-color1">訂單狀態</label>
+                </div>
+                <div class="col-auto">
+                    <select asp-for="DonationStatus" class="form-select fz-color1 w-auto" required>
+                        <option value="1">待出貨</option>
+                        <option value="2">待收貨</option>
+                        <option value="3">訂單已完成</option>
+                        <option value="4">不成立</option>
+                    </select>
+                </div>
+                
+            </div>
+        </div>
+        <div class="form-group mb-4 m-auto d-flex justify-content-end">
+            <button type="submit" form="editForm" id="submitForm" class="btn btn-border a px-3 me-2 fw-bold fz-color2">送出</button>
+            <button type="button" id="cancelForm" class="btn btn-border a px-3 fw-bold fz-color2">取消</button>
+        </div>
+    </form>
+
+    <script>
+        document.getElementById("cancelForm").addEventListener("click", function () {
+            window.location.href = '/Collect/DonationManagement';
+        });
+        document.getElementById("submitForm").addEventListener("click", function () {
+            var form = document.getElementById("editForm");
+            if (form.checkValidity()) {
+                alert("捐贈表單填寫成功！");
+                form.submit();
+            } else {
+                alert("請再仔細檢查所有欄位！");
+            }
+        });
+    </script>
+
+</div>
+
+

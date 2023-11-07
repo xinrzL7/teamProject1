@@ -1,0 +1,184 @@
+﻿﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@using System.Text.Json
+@using prjMvcCoreDemo.Models
+
+﻿@{
+    ViewData["Title"] = "Login";
+}
+@{
+    string updatedPhotoPath = HttpContextAccessor.HttpContext.Session.GetString(CDictionary.SK_LOINGED_USER_PHOTO);
+    string loggedInUserJson = HttpContextAccessor.HttpContext.Session.GetString(CDictionary.SK_LOINGED_USER);
+    TMember loggedInUser = null;
+
+    if (!string.IsNullOrEmpty(loggedInUserJson))
+    {
+        loggedInUser = JsonSerializer.Deserialize<TMember>(loggedInUserJson);
+    }
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EnGee</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    @*  Min新增 *@
+    <script src="https://unpkg.com/vue@3"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+          integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="~/lib/animate/animate.min.css" rel="stylesheet">
+    <link href="~/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="~/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="~/css/HomepageStyle.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/css/custom.css">
+
+    <!-- 框架CSS  -->
+    <link rel="stylesheet" href="~/css/EnGeeframe_Admin.css">
+
+</head>
+<body>
+    <div id="spinner"
+         class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-md sticky-top ">
+        <div class="container-md d-flex justify-content-between align-items-center">
+            <a class="navbar-brand me-2 p-0" asp-area="" asp-controller="Admin" asp-action="Index">
+                <img class="logo-size" src="~/images/bigframe/logo01_admin.png" alt="logo" asp-area="" asp-controller="Home" asp-action="Index">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1 border-0">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Min_backmanage" asp-action="List">會員管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="SSJ_ShoppingList" asp-action="ShoppingList_admin">訂單管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="NL_AD_Product" asp-action="List">商品管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Collect" asp-action="CollectManagement">許願池管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Collect" asp-action="DonationManagement">捐贈訂單管理</a>
+                    </li>                       
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" target="_blank" href="https://pay.line.me/portal/tw/auth/login">儲值管理</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="d-flex justify-content-end me-3 h-30px">
+                    <div class="d-flex align-content-center">
+                        @if (loggedInUser != null)
+                        {
+                            @if (!string.IsNullOrEmpty(updatedPhotoPath))
+                            {
+                                <img src="~/images/UserImage/@updatedPhotoPath" alt="User Photo" class="mt-1 me-3" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;" />
+                            }
+                            else if (!string.IsNullOrEmpty(loggedInUser?.PhotoPath))
+                            {
+                                <img src="~/images/UserImage/@loggedInUser.PhotoPath" alt="User Photo" class="mt-1 me-3" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <img src="~/images/UserImage/profile.png" alt="Default User Photo" class="mt-1 me-3" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;" />
+                            }
+
+                            <div class="btn-group">
+                                <button type="button" class="btn text-black dropdown-toggle me-3" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Hello~@loggedInUser.Username
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Index">返回EnGee前台</a>                                    
+                                </div>
+                            </div>
+                            <form asp-controller="Home" asp-action="Logout" method="post">
+                                <button type="submit" class="nav-link btn bg-color2 btn-sm text-white">
+                                    登出
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <img src="~/Images/UserImage/profile.png" alt="User Photo" class="mt-1 me-3" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;" />
+                            <form asp-controller="Home" asp-action="Login" method="post">
+                                <button type="submit" class="nav-link btn bg-color2 btn-sm">
+                                    登入
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    @*<header>
+        <div class="headerimg">
+            <div class="overlay">
+                <div class="d-flex align-items-center justify-content-center text-white fz-size32px"
+                     style="height: 100%">
+                    @ViewBag.HeaderTitle
+                </div>
+            </div>
+        </div>
+    </header>*@
+
+    @*         <div class="container"> *@
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+    @*     </div> *@
+
+    <footer class="border-top footer text-muted bg-color1">
+        <div class="container h-64px d-flex align-items-center justify-content-center">
+            &copy; Engee CO.,LTD All rights reserved.
+        </div>
+    </footer>
+</body>
+</html>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+@*     <script src="~/js/site.js" asp-append-version="true"></script>使否有人用到?? *@
+<!-- JavaScript Libraries -->
+<script src="~/lib/wow/wow.min.js"></script>
+<script src="~/lib/easing/easing.min.js"></script>
+<script src="~/lib/waypoints/waypoints.min.js"></script>
+<script src="~/lib/owlcarousel/owl.carousel.min.js"></script>
+
+<!-- Template Javascript -->
+<script src="~/js/main.js"></script>
+@await RenderSectionAsync("Scripts", required: false)

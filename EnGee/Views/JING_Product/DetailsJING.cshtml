@@ -1,0 +1,345 @@
+﻿@model EnGee.ViewModel.JING_ProductDetailsViewModel
+@*商品詳情*@
+@{
+    ViewBag.Title = Model.ProductName + " Details";
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+
+
+<style>
+
+   
+    
+    .product-image-section img {
+        width: 250px;
+        height: 100%;
+        object-fit: contain;
+        max-height: 250px;
+    }
+
+    .product-Detail-section {
+    }
+
+    .message-content {
+        font-size: 1.5em; /* 設定字體大小為1.5倍的基本大小 */
+    }
+
+    .message-details {
+        font-size: 1.0em; /* 設定字體大小為基本大小 */
+    }
+
+    .add-to-favorites.active {
+        background-color: #FFC197;
+        color: white;
+    }
+
+    .add-to-favorites.active .fa-heart {
+            color: white;
+        }
+
+    /* 這是一種更淡的紅色 */
+    .btn-lighter-danger {
+        background-color: #ffcccc; /* 極淡的紅色 */
+        border-color: #ffb3b3;
+        color: #800000; /* 文字顏色 */
+        transition: background-color 0.3s ease; /* 平滑的過渡效果 */
+    }
+
+        /* 滑鼠懸停時的色彩 */
+        .btn-lighter-danger:hover {
+            background-color: #ff9999; /* 當滑鼠懸停時的顏色稍微深一點 */
+            border-color: #ff8080;
+            color: #660000; /* 文字顏色 */
+        }
+</style>
+<main>
+    <div class="container py-5">
+        <div class="row border-0 ">
+            <div class="product-details-container d-flex justify-content-center m-2">
+                <div class="product-image-section col-l-6 col-md-6 col-sm-6 col-xs-4 col-2 d-flex align-items-center justify-content-center">
+                    <img src="@Model.ProductImagePath" alt="@Model.ProductName Image">
+                </div>
+                <div class="product-details-container col-md-4 col-4  d-flex align-items justify-content-center ms-5">
+                    <div class="product-Detail-section fz-size28px">
+
+                        <div class="product-info-section d-flex flex-column">
+                            <div class="product-info-row">
+                                <h1 class="product-title">@Model.ProductName</h1>
+                            </div>
+                            <div class="product-info-row">
+                                <div class="product-brand">品牌: @Model.BrandName</div>
+                                <div class="product-category">主分類: @Model.MainCategoryName</div>
+                                <div class="product-subcategory">子分類: @Model.SubcategoryName</div>
+                                <div class="product-description">商品詳情: @Model.ProductDescribe</div>
+                                <!-- 其他資訊行... -->
+                            </div>
+                            <div class="product-info-row">
+                                <div class="product-price">單價: @Model.ProductUnitPoint 點</div>
+                                <div class="product-remaining-quantity">剩餘數量: @Model.ProductRemainingQuantity</div>
+                                <div class="product-expiration-date">過期日期 @Model.ProductExpirationDate.ToShortDateString()</div>
+                                <div class="product-usage-status">使用狀態: @Model.ProductUsageStatus</div>
+                            </div>
+                            <div class="product-info-row">
+                                <div class="product-delivery-type">送貨方式: @Model.DeliveryTypeName</div>
+                                <div class="product-delivery-fee">運費: NT$ @Model.DeliveryFee</div>
+                                <div class="product-seller-name">賣家: @Model.SellerName</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <form id="productForm" asp-controller="JING_Demand" asp-action="DemandView" method="post">
+                                <!-- Product ID (Hidden) -->
+                                <input type="hidden" name="txtProductId" value="@Model.ProductId" />
+                                <input type="hidden" name="deliveryOption" value="" class="deliveryOptionInput" />
+
+                                <!-- 數量 -->
+                                <div class="Purchase-quantity-section d-flex">
+                                    <label class="" for="txtCount">數量:</label>
+                                    <button class="btn btn-rong-s btnHoverStyle2" type="button" id="btnMinus">-</button>
+                                    <div class="col-md-10 w-64px">
+                                        @Html.TextBox("txtCount", "1", new { @class = "form-control" })
+                                    </div>
+                                    <button class="btn btn-rong-s btnHoverStyle2" type="button" id="btnPlus">+</button>
+                                </div>
+
+                                <!-- 配送方式 -->
+                                <div class="choose-product-delivery-section d-flex flex-wrap">
+                                    <div id="delyTitle">配送方式:</div>
+                                    <div class="shippingList">
+                                        @*                                            <label><input type ="radio" name="deliveryType" delytype="宅配" id="homeDelivery" checked="">宅配</label>
+                                        <label><input type="radio" name="deliveryType" delytype="超商/i郵箱/myfone門市取貨" id="StorePickup">超商/i郵箱/myfone門市取貨</label>*@
+                                        <label><input type="radio" name="deliverytypeid" delytype="宅配" value="1" id="homeDelivery" checked="">宅配</label>
+                                        <label><input type="radio" name="deliverytypeid" delytype="超商門市取貨" value="2" id="StorePickup">超商門市取貨</label>
+                                    </div>
+                                </div>
+
+                                <!-- 行动 -->
+                                <div class="product-action-section d-flex">
+                                    <button class="btn btn-m btnHoverStyle2 m-2 add-to-cart" type="button">加入購物車</button>
+                                    <button class="btn btn-m btnHoverStyle2 m-2" type="submit" name="actionType" value="buyNow" class="buy-now">我要索取</button>
+                                    @*       <button class="btn btn-m btnHoverStyle2 m-2 add-to-favorites" data-productid="@Model.ProductId" type="button">加入我的最愛</button> *@
+                                    <button class="btn btn-m btnHoverStyle2 m-2 add-to-favorites @(Model.IsFavorite ? "active" : "")" data-productid="@Model.ProductId" type="button">
+                                        <i class="fas fa-heart"></i> @(Model.IsFavorite ? "已加入我的最愛" : "加入我的最愛")
+                                    </button>
+
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</main>
+<!-- 留言板區域 -->
+<section class="container py-5">
+    <h2 class="mb-4">留言板</h2>
+    <ul class="list-group">
+        @if (Model.Messages != null && Model.Messages.Any())
+        {
+            @foreach (var message in Model.Messages)
+            {
+                <li class="list-group-item">
+                    <div class="message-content">@message.MessageContent</div>
+                    <div class="message-details">
+                        <p><strong>會員名稱</strong>: @message.Member.Username</p>
+                        <p><strong>留言時間</strong> @message.MessageDate.Value.ToString("yyyy-MM-dd HH:mm:ss")</p>
+                        <!-- 您可以根據需要添加其他相關信息，例如留言時間、用戶名等 -->
+                    </div>
+
+                    @if (Model.LoggedInUserId.HasValue && message.MemberId == Model.LoggedInUserId.Value)
+                    {
+                        <text>
+                            <!-- 插入刪除留言的表單 -->
+                            <button class="btn btn-danger deleteBtn" data-message-id="@message.MessageId">
+                                <i class="bi bi-trash"></i> 刪除
+                            </button>
+                        </text>
+                    }
+                </li>
+            }
+        }
+        else
+        {
+            <text>
+            <li class="list-group-item">目前還沒有留言</li></text>
+        }
+
+    </ul>
+    <!-- 留言提交表單 -->
+    <div class="mt-4">
+        <form asp-controller="Message" asp-action="AddMessage" method="post">
+            <input type="hidden" name="ProductId" value="@Model.ProductId" />
+            <input type="hidden" name="MessageArea" value="2" />
+            <div class="mb-3">
+                <textarea class="form-control" name="MessageContent" rows="4" placeholder="請輸入您的留言"></textarea>
+                <span id="remainingChars"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">提交留言</button>
+        </form>
+    </div>
+</section>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var deleteButtons = document.querySelectorAll('.deleteBtn');
+        deleteButtons.forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                var messageId = e.target.getAttribute('data-message-id');
+                Swal.fire({
+                    title: '你確定嗎？',
+                    text: "一旦刪除，你將無法恢復這條留言！",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    cancelButtonText: '我考慮一下😅',
+                    confirmButtonText: 'Yes，刪除它！'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        deleteMessage(messageId); // 调用删除操作
+                    }
+                })
+            });
+        });
+    });
+
+    function deleteMessage(messageId) {
+        // 在這裡，你需要使用 AJAX 或者其他方式將 messageId 傳送到服務器進行刪除操作。
+        // 或者你也可以創建一個隱藏的表單，設定它的 messageId 值，然後提交表單。
+        var form = document.createElement('form');
+        form.method = 'post';
+        form.action = '@Url.Action("DeleteMessage", "Message")'; // 這裡應該是你的刪除留言的伺服器端路由
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'messageId';
+        input.value = messageId;
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+
+    }
+
+    $(document).ready(function () {
+        // 字數限制功能
+        const maxCharacters = 200;
+        const remainingCharsSpan = $('<span class="remaining-chars">還可以輸入 ' + maxCharacters + ' 個字</span>');
+        $("textarea[name='MessageContent']").after(remainingCharsSpan);
+
+        $("textarea[name='MessageContent']").on('input', function () {
+            const inputLength = $(this).val().length;
+            const remainingChars = maxCharacters - inputLength;
+
+            // 更新顯示的剩餘字數
+            remainingCharsSpan.text('還可以輸入 ' + remainingChars + ' 個字');
+        });
+
+
+
+        // 初始化設置
+        var initialDelivery = $("input[name='deliveryType']:checked").attr("delytype");
+        $(".deliveryOptionInput").val(initialDelivery);
+
+        // 當選擇配送方式時
+        $("input[name='deliveryType']").on("change", function () {
+            var selectedDelivery = $(this).attr("delytype");
+            $(".deliveryOptionInput").val(selectedDelivery);
+        });
+
+        // 當點擊 "增加" 按鈕
+        $("#btnPlus").on("click", function () {
+            var currentCount = parseInt($("#txtCount").val(), 10);
+            $("#txtCount").val(currentCount + 1);
+        });
+
+        // 當點擊 "減少" 按鈕
+        $("#btnMinus").on("click", function () {
+            var currentCount = parseInt($("#txtCount").val(), 10);
+            if (currentCount > 1) { // 確保數量不會小於1
+                $("#txtCount").val(currentCount - 1);
+            }
+        });
+
+        $('.add-to-cart, .buy-now').on('click', function (e) {
+            e.preventDefault();
+            $.ajax({
+                // ...
+                success: function (response) {
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'success',
+                        title: '已加入購物車',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'error',
+                        title: '添加失敗，請稍後再試',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                }
+            });
+        });
+
+        $('.add-to-favorites').on('click', function () {
+            const $thisButton = $(this);
+            const productId = $thisButton.data('productid');
+
+            $.ajax({
+                url: '/Favorite/AddToFavorites',
+                method: 'POST',
+                data: {
+                    productId: productId,
+                    addFavoriteType: true
+                },
+                success: function (response) {
+                    if (response.redirectToLogin) {
+                        window.location.href = "/Home/Login";
+                    } else if (response.success) {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'success',
+                            title: '成功加入我的最愛！',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                        $thisButton.addClass('active');
+                        $thisButton.html('<i class="fas fa-heart"></i> 已加入我的最愛');
+                    } else {
+                        Swal.fire({
+                            position: 'center',
+                            icon: 'error',
+                            title: response.message || '加入失敗，請稍後再試！',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'error',
+                        title: '加入失敗，請稍後再試！',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+

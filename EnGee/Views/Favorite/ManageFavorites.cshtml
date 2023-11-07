@@ -1,0 +1,71 @@
+﻿@model IEnumerable<EnGee.Models.TMemberFavorite>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@{
+    Layout = "_LayoutAdmin";   
+}
+<div class="container">
+<h2>我的最愛</h2>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>產品名稱</th>
+            <th>添加日期</th>
+            <th>功能</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var favorite in Model)
+        {
+            <tr>
+                <td>@favorite.Product.ProductName</td>
+                <td>@favorite.AddFavoriteDate.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <div style="display: flex; align-items: center;">
+                        <form method="post" action="@Url.Action("RemoveFromFavorites", "Favorite")" style="margin-right: 10px;">
+                            <input type="hidden" name="favoriteId" id="favoriteId-@favorite.FavoriteId" value="@favorite.FavoriteId" />
+                            <button type="button" class="btn btn-danger" onclick="showDeleteConfirmation(@favorite.FavoriteId)">刪除</button>
+                        </form>
+                        <button onclick="location.href='@Url.Action("DetailsJING", "JING_Product", new { id = favorite.ProductId })'" class="btn btn-danger">商品頁面</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+</div>
+
+<script>
+    function showDeleteConfirmation(favoriteId) {
+        Swal.fire({
+            title: '您確定要刪除嗎？',
+            text: "您將無法還原此操作！",
+            //icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '確定，刪除！'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 創建一個表單並設置屬性
+                var form = document.createElement('form');
+                form.method = 'post';
+                form.action = '@Url.Action("RemoveFromFavorites", "Favorite")';
+
+                // 創建一個隱藏的 input 元素並設置其值為 favoriteId
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'favoriteId';
+                input.value = favoriteId;
+
+                // 將 input 元素添加到表單
+                form.appendChild(input);
+
+                // 將表單添加到 body，並提交表單
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    }
+</script>
